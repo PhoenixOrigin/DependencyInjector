@@ -14,7 +14,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.Objects;
 
-public class InjectParameterHandler extends Abstract {
+public class InjectParameterHandler extends AbstractHandler {
     private List<JCTree.JCMethodDecl> handled = List.nil();
 
     public InjectParameterHandler(Trees trees, TreeMaker treeMaker, Context context) {
@@ -84,7 +84,7 @@ public class InjectParameterHandler extends Abstract {
         );
         JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(
                 List.nil(),
-                treeMaker.Select(treeMaker.Ident(names.fromString("InjectionValues")), names.fromString("getValue")),
+                treeMaker.Select(treeMaker.Ident(names.fromString("JavaPlusPlus")), names.fromString("getValue")),
                 List.of(paramTypeClassExpr)
         );
         JCTree.JCExpression typeCastExpr = treeMaker.TypeCast(

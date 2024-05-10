@@ -8,12 +8,12 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.lang.model.element.Element;
 
-public abstract class Abstract {
+public abstract class AbstractHandler {
     final Trees trees;
     final TreeMaker treeMaker;
     final Context context;
 
-    public Abstract(Trees trees, TreeMaker treeMaker, Context context) {
+    public AbstractHandler(Trees trees, TreeMaker treeMaker, Context context) {
         this.trees = trees;
         this.treeMaker = treeMaker;
         this.context = context;

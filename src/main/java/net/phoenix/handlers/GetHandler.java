@@ -13,7 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 
-public class GetHandler extends Abstract {
+@SuppressWarnings("DuplicatedCode")
+public class GetHandler extends AbstractHandler {
     public GetHandler(Trees trees, TreeMaker treeMaker, Context context) {
         super(trees, treeMaker, context);
     }
@@ -50,8 +51,7 @@ public class GetHandler extends Abstract {
         List<JCTree.JCVariableDecl> params = List.nil();
         List<JCTree.JCExpression> thrown = List.nil();
         List<JCTree.JCStatement> body = List.of(treeMaker.Return(treeMaker.Select(treeMaker.Ident(classDecl.name), field.getName())));
-        JCTree.JCMethodDecl methodDecl = treeMaker.MethodDef(treeMaker.Modifiers(Flags.STATIC | flags), name, returnType, typeParams, params, thrown, treeMaker.Block(0, body), null);
-        return methodDecl;
+        return treeMaker.MethodDef(treeMaker.Modifiers(Flags.STATIC | flags), name, returnType, typeParams, params, thrown, treeMaker.Block(0, body), null);
     }
 
     private JCTree.JCMethodDecl createGetter(int flags, @NotNull JCTree.JCVariableDecl field) {

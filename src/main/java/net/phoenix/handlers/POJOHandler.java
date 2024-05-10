@@ -17,7 +17,8 @@ import javax.lang.model.element.Modifier;
 import static com.sun.tools.javac.code.Flags.PARAMETER;
 import static com.sun.tools.javac.code.TypeTag.VOID;
 
-public class POJOHandler extends Abstract {
+@SuppressWarnings("DuplicatedCode")
+public class POJOHandler extends AbstractHandler {
     public POJOHandler(Trees trees, TreeMaker treeMaker, Context context) {
         super(trees, treeMaker, context);
     }
@@ -50,13 +51,12 @@ public class POJOHandler extends Abstract {
             params = params.append(param);
             body = body.append(treeMaker.Exec(treeMaker.Assign(treeMaker.Select(treeMaker.Ident(names.fromString("this")), field.getName()), treeMaker.Ident(field.getName()))));
         }
-        System.out.println(params);
         JCTree.JCBlock block = treeMaker.Block(0, body);
         JCTree.JCMethodDecl methodDecl = treeMaker.MethodDef(treeMaker.Modifiers(Flags.PUBLIC), names.init, null, List.nil(), params, List.nil(), block, null);
 
         for (JCTree def : classDecl.defs) {
             if (def instanceof JCTree.JCMethodDecl method) {
-                if (method.getName().toString() == "<init>") {
+                if (method.getName().toString().equals("<init>")) {
                     classDecl.defs.remove(methodDecl);
                     return;
                 }

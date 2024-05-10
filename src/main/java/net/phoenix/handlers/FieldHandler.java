@@ -1,16 +1,18 @@
 package net.phoenix.handlers;
 
 import com.sun.source.util.Trees;
-import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
+import com.sun.tools.javac.tree.TreeScanner;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
+import org.jetbrains.annotations.NotNull;
 
 import javax.lang.model.element.Element;
 
-public class FieldHandler extends Abstract {
+public class FieldHandler extends AbstractHandler {
     public FieldHandler(Trees trees, TreeMaker treeMaker, Context context) {
         super(trees, treeMaker, context);
     }
@@ -24,17 +26,38 @@ public class FieldHandler extends Abstract {
 
         classDecl.defs.forEach(m -> {
             if(m instanceof JCTree.JCMethodDecl methodDecl) {
-                modifyMethod(methodDecl, variableDecl, classDecl);
+                if (shouldInject(methodDecl, variableDecl)) modifyMethod(methodDecl, variableDecl, classDecl);
             }
         });
     }
 
-    private void modifyMethod(JCTree.JCMethodDecl method, JCTree.JCVariableDecl variableDecl, JCTree.JCClassDecl classDecl) {
-        List<JCTree.JCExpression> exp = List.of(treeMaker.Exec(treeMaker.Assign(treeMaker.Select(treeMaker.Ident(classDecl.name), variableDecl.getName()), initGen(variableDecl))).getExpression());
-        method.body.stats.prepend()
+    private boolean shouldInject(JCTree.JCMethodDecl methodDecl, JCTree.@NotNull JCVariableDecl variableDecl) {
+        final boolean[] isReferenced = {false};
+        TreeScanner scanner = new TreeScanner() {
+            private final Name name;
+
+            {
+                name = variableDecl.getName();
+            }
+
+            @Override
+            public void visitIdent(JCTree.@NotNull JCIdent jcIdent) {
+                if (jcIdent.name.equals(name)) {
+                    isReferenced[0] = true;
+                }
+                super.visitIdent(jcIdent);
+            }
+
+        };
+        scanner.scan(methodDecl);
+        return isReferenced[0];
     }
 
-    private JCTree.JCExpression initGen(JCTree.JCVariableDecl param) {
+    private void modifyMethod(JCTree.@NotNull JCMethodDecl method, JCTree.@NotNull JCVariableDecl variableDecl, JCTree.@NotNull JCClassDecl classDecl) {
+        method.body.stats = method.body.stats.prepend(treeMaker.Exec(treeMaker.Assign(treeMaker.Select(treeMaker.Ident(classDecl.name), variableDecl.getName()), initGen(variableDecl))));
+    }
+
+    private JCTree.JCExpression initGen(JCTree.@NotNull JCVariableDecl param) {
         Names names = Names.instance(context);
         JCTree.JCExpression paramTypeClassExpr = treeMaker.Select(
                 treeMaker.Ident(names.fromString(param.vartype.toString())),
@@ -42,7 +65,7 @@ public class FieldHandler extends Abstract {
         );
         JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(
                 List.nil(),
-                treeMaker.Select(treeMaker.Ident(names.fromString("InjectionValues")), names.fromString("getValue")),
+                treeMaker.Select(treeMaker.Ident(names.fromString("JavaPlusPlus")), names.fromString("getValue")),
                 List.of(paramTypeClassExpr)
         );
         return treeMaker.TypeCast(

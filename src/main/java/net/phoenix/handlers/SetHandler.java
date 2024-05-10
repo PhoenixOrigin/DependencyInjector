@@ -16,7 +16,8 @@ import javax.lang.model.element.Modifier;
 import static com.sun.tools.javac.code.Flags.PARAMETER;
 import static com.sun.tools.javac.code.TypeTag.VOID;
 
-public class SetHandler extends Abstract {
+@SuppressWarnings("DuplicatedCode")
+public class SetHandler extends AbstractHandler {
     public SetHandler(Trees trees, TreeMaker treeMaker, Context context) {
         super(trees, treeMaker, context);
     }
@@ -28,7 +29,7 @@ public class SetHandler extends Abstract {
 
     void setter(@NotNull Element element) {
         JCTree.JCVariableDecl variableDecl = (JCTree.JCVariableDecl) trees.getTree(element);
-        JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) trees.getPath(element).getCompilationUnit().getTypeDecls().get(0);
+        JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) trees.getTree(element.getEnclosingElement());
         if (element.getModifiers().contains(Modifier.STATIC)) {
             if (element.getModifiers().contains(Modifier.PUBLIC)) {
                 inject(classDecl, createStaticSetter(Flags.PUBLIC, variableDecl, classDecl));
@@ -53,9 +54,7 @@ public class SetHandler extends Abstract {
         List<JCTree.JCVariableDecl> params = List.of(treeMaker.VarDef(treeMaker.Modifiers(PARAMETER), field.getName(), field.vartype, null));
         List<JCTree.JCExpression> thrown = List.nil();
         List<JCTree.JCStatement> body = List.of(treeMaker.Exec(treeMaker.Assign(treeMaker.Select(treeMaker.Ident(classDecl.name), field.getName()), treeMaker.Ident(field.getName()))));
-        JCTree.JCMethodDecl methodDecl = treeMaker.MethodDef(treeMaker.Modifiers(Flags.STATIC | flags), name, returnType, typeParams, params, thrown, treeMaker.Block(0, body), null);
-        System.out.println(methodDecl);
-        return methodDecl;
+        return treeMaker.MethodDef(treeMaker.Modifiers(Flags.STATIC | flags), name, returnType, typeParams, params, thrown, treeMaker.Block(0, body), null);
     }
 
 
