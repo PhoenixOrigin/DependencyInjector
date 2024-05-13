@@ -12,8 +12,8 @@ To use the dependency injector, you need to add the following dependencies to yo
 
 ```groovy
 dependencies {
-    compileOnly 'io.github.phoenixorigin:DependencyInjector:1.0.0'
-    annotationProcessor 'io.github.phoenixorigin:DependencyInjector:1.0.0'
+    compileOnly 'io.github.phoenixorigin:dependency-injector:1.0.0'
+    annotationProcessor 'io.github.phoenixorigin:dependency-injector:1.0.0'
 }
 ```
 
