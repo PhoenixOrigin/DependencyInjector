@@ -25,7 +25,7 @@ public class FieldHandler extends AbstractHandler {
         variableDecl.init = initGen(variableDecl);
 
         classDecl.defs.forEach(m -> {
-            if(m instanceof JCTree.JCMethodDecl methodDecl) {
+            if (m instanceof JCTree.JCMethodDecl methodDecl) {
                 if (shouldInject(methodDecl, variableDecl)) modifyMethod(methodDecl, variableDecl, classDecl);
             }
         });
@@ -65,7 +65,7 @@ public class FieldHandler extends AbstractHandler {
         );
         JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(
                 List.nil(),
-                treeMaker.Select(treeMaker.Ident(names.fromString("JavaPlusPlus")), names.fromString("getValue")),
+                treeMaker.Select(treeMaker.Ident(names.fromString("DIValues")), names.fromString("getValue")),
                 List.of(paramTypeClassExpr)
         );
         return treeMaker.TypeCast(

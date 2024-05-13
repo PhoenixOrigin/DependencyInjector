@@ -20,8 +20,4 @@ public abstract class AbstractHandler {
     }
 
     public abstract void handle(Element element);
-
-    void inject(JCTree.@NotNull JCClassDecl classDecl, JCTree.JCMethodDecl methodDecl) {
-        classDecl.defs = classDecl.defs.prepend(methodDecl);
-    }
 }

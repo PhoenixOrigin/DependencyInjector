@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
-public class JavaPlusPlus {
+public class DIValues {
     private static final @NotNull ConcurrentHashMap<Class<?>, Object> values = new ConcurrentHashMap<>();
 
     public static void storeValue(@NotNull Class<?> clazz, @NotNull Object value) {
@@ -18,15 +18,5 @@ public class JavaPlusPlus {
 
     public static Object getValue(Class<?> clazz) {
         return values.get(clazz);
-    }
-
-
-    public static @NotNull RuntimeException sneakyThrow(@NotNull Throwable t) {
-        return sneakyThrow0(t);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends Throwable> T sneakyThrow0(Throwable t) throws T {
-        throw (T)t;
     }
 }

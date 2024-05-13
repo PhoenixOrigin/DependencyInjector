@@ -84,7 +84,7 @@ public class InjectParameterHandler extends AbstractHandler {
         );
         JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(
                 List.nil(),
-                treeMaker.Select(treeMaker.Ident(names.fromString("JavaPlusPlus")), names.fromString("getValue")),
+                treeMaker.Select(treeMaker.Ident(names.fromString("DIValues")), names.fromString("getValue")),
                 List.of(paramTypeClassExpr)
         );
         JCTree.JCExpression typeCastExpr = treeMaker.TypeCast(
