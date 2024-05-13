@@ -5,9 +5,8 @@ import com.sun.source.util.Trees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
-import net.phoenix.annotations.InjectParameter;
-import net.phoenix.handlers.FieldHandler;
-import net.phoenix.handlers.InjectParameterHandler;
+import net.phoenix.annotations.Inject;
+import net.phoenix.handlers.InjectHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -19,6 +18,11 @@ import javax.lang.model.element.TypeElement;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Generic Annotation processor
+ *
+ * @author Phoenix
+ */
 @AutoService(javax.annotation.processing.Processor.class)
 public class AnnotationProcessor extends AbstractProcessor {
 
@@ -26,6 +30,11 @@ public class AnnotationProcessor extends AbstractProcessor {
     private TreeMaker treeMaker;
     private Context context;
 
+    /**
+     * Initializes the processor
+     *
+     * @param processingEnv the processing environment
+     */
     @Override
     public synchronized void init(@NotNull ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
@@ -36,30 +45,41 @@ public class AnnotationProcessor extends AbstractProcessor {
         System.out.println("init");
     }
 
+    /**
+     * Returns the latest supported source version
+     *
+     * @return the latest supported source version
+     */
     @Override
     public SourceVersion getSupportedSourceVersion() {
         return SourceVersion.latestSupported();
     }
 
+    /**
+     * Returns the supported annotation types
+     *
+     * @return the supported annotation types
+     */
     @Override
     public @NotNull Set<String> getSupportedAnnotationTypes() {
         HashSet<String> annotations = new HashSet<>();
-        annotations.add(InjectParameter.class.getCanonicalName());
-        annotations.add(net.phoenix.annotations.InjectField.class.getCanonicalName());
+        annotations.add(Inject.class.getCanonicalName());
         return annotations;
     }
 
+    /**
+     * Processes the annotations
+     *
+     * @param annotations the annotations
+     * @param roundEnv    the round environment
+     * @return true if the annotations were processed successfully
+     */
     @Override
     public boolean process(Set<? extends TypeElement> annotations, @NotNull RoundEnvironment roundEnv) {
-        InjectParameterHandler injectParameterHandler = new InjectParameterHandler(trees, treeMaker, context);
-        FieldHandler fieldHandler = new FieldHandler(trees, treeMaker, context);
+        InjectHandler injectHandler = new InjectHandler(trees, treeMaker, context);
 
-        for (Element element : roundEnv.getElementsAnnotatedWith(InjectParameter.class)) {
-            injectParameterHandler.handle(element);
-        }
-
-        for (Element element : roundEnv.getElementsAnnotatedWith(net.phoenix.annotations.InjectField.class)) {
-            fieldHandler.handle(element);
+        for (Element element : roundEnv.getElementsAnnotatedWith(Inject.class)) {
+            injectHandler.handle(element);
         }
 
         return true;

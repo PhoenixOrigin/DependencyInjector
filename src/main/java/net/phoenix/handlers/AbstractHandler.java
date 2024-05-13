@@ -1,13 +1,16 @@
 package net.phoenix.handlers;
 
 import com.sun.source.util.Trees;
-import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
-import org.jetbrains.annotations.NotNull;
 
 import javax.lang.model.element.Element;
 
+/**
+ * Abstract handler for annotation processors, extended and implemented for each annotation.
+ *
+ * @author Phoenix
+ */
 public abstract class AbstractHandler {
     final Trees trees;
     final TreeMaker treeMaker;

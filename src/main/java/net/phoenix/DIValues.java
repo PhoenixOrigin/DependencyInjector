@@ -12,7 +12,7 @@ public class DIValues {
         values.put(clazz, value);
     }
 
-    public static void store(@NotNull Object value) {
+    public static void storeValue(@NotNull Object value) {
         values.put(value.getClass(), value);
     }
 
