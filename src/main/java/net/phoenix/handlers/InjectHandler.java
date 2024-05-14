@@ -25,6 +25,7 @@ import java.util.Objects;
  * @see net.phoenix.annotations.Inject
  * @see net.phoenix.DIValues
  */
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class InjectHandler extends AbstractHandler {
 
     private List<JCTree.JCMethodDecl> handled = List.nil();
