@@ -1,10 +1,9 @@
 plugins {
     id 'java'
-    id 'maven-publish'
 }
 
-group = 'net.phoenix'
-version = '1.0.3'
+group = 'io.github.phoenixorigin'
+version = '1.0.0'
 
 repositories {
     mavenCentral()
@@ -14,8 +13,7 @@ dependencies {
     implementation 'org.jetbrains:annotations:24.0.0'
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    implementation files("${System.properties['java.home']}/lib/tools.jar")
-    implementation 'com.google.auto.service:auto-service:1.1.1'
+    compileOnly 'com.google.auto.service:auto-service:1.1.1'
     annotationProcessor('com.google.auto.service:auto-service:1.1.1')
 }
 
@@ -25,37 +23,11 @@ test {
 
 compileJava {
     options.fork = true
-    options.compilerArgs += [
-            '--add-exports', 'jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
-            '--add-exports', 'jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
-            '--add-exports', 'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-    ]
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            version = '1.0.' + project.properties['VERSION_CODE']
-        }
-    }
-    repositories {
-        mavenLocal()
+    options.forkOptions.with {
+        jvmArgs = [
+                '--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
+                '--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+                '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+        ]
     }
 }
-
-tasks.register('incrementVersion') {
-    doLast {
-        def propsFile = file('gradle.properties')
-        def props = new Properties()
-        propsFile.withInputStream { props.load(it) }
-
-        def versionCode = props['VERSION_CODE'].toInteger()
-        versionCode++
-
-        props['VERSION_CODE'] = versionCode.toString()
-        propsFile.withWriter { props.store(it, null) }
-    }
-}
-
-tasks.getByName('publish').dependsOn('incrementVersion')

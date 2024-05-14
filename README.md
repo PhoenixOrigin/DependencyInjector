@@ -22,11 +22,13 @@ and you need to export the sun packages by adding the following to your `build.g
 ```groovy
 compileJava {
     options.fork = true
-    options.compilerArgs += [
-            '--add-exports', 'jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
-            '--add-exports', 'jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
-            '--add-exports', 'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-    ]
+    options.forkOptions.with {
+        jvmArgs = [
+                '--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
+                '--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+                '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+        ]
+    }
 }
 ```
 
