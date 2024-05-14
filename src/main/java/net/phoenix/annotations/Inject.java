@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
  */
 @Target({java.lang.annotation.ElementType.FIELD, java.lang.annotation.ElementType.PARAMETER, ElementType.TYPE, ElementType.METHOD})
 public @interface Inject {
+    String key() default "default";
 }

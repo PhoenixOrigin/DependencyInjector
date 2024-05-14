@@ -17,7 +17,7 @@ dependencies {
 }
 ```
 
-and you need to export the sun packages by adding the following to your `build.gradle` file:
+Then, you need to expose the sun packages by adding the following to your `build.gradle` file:
 
 ```groovy
 compileJava {

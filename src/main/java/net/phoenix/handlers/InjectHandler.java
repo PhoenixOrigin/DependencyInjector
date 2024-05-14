@@ -87,7 +87,6 @@ public class InjectHandler extends AbstractHandler {
 
         sortParams(newMethodDecl, names);
         classDecl.defs = classDecl.defs.prepend(newMethodDecl);
-        System.out.println(newMethodDecl);
         handled = handled.prepend(newMethodDecl);
     }
 
@@ -181,7 +180,9 @@ public class InjectHandler extends AbstractHandler {
      * @param classDecl    The class declaration
      */
     private void modifyMethod(JCTree.@NotNull JCMethodDecl method, JCTree.@NotNull JCVariableDecl variableDecl, JCTree.@NotNull JCClassDecl classDecl) {
+        System.out.println(method.body);
         method.body.stats = method.body.stats.prepend(treeMaker.Exec(treeMaker.Assign(treeMaker.Select(treeMaker.Ident(classDecl.name), variableDecl.getName()), initGen(variableDecl))));
+        System.out.println(method.body);
     }
 
     /**
@@ -196,11 +197,27 @@ public class InjectHandler extends AbstractHandler {
                 treeMaker.Ident(names.fromString(param.vartype.toString())),
                 names.fromString("class")
         );
-        JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(
-                List.nil(),
-                treeMaker.Select(treeMaker.Ident(names.fromString("DIValues")), names.fromString("getValue")),
-                List.of(paramTypeClassExpr)
-        );
+        JCTree.JCMethodInvocation methodInvocation;
+        if (param.mods.annotations.stream().anyMatch(a -> !a.getArguments().isEmpty())) {
+            JCTree.JCAnnotation annotation = param.mods.annotations.stream().filter(a -> a.getAnnotationType().toString().equals("Inject")).findFirst().get();
+            JCTree.JCLiteral key = (JCTree.JCLiteral)((JCTree.JCAssign)annotation.getArguments().get(0)).rhs;
+            System.out.println(key);
+            methodInvocation = treeMaker.Apply(
+                    List.nil(),
+                    treeMaker.Select(treeMaker.Ident(names.fromString("DIValues")), names.fromString("getValue")),
+                    List.of(paramTypeClassExpr, key)
+            );
+        } else {
+            methodInvocation = treeMaker.Apply(
+                    List.nil(),
+                    treeMaker.Select(treeMaker.Ident(names.fromString("DIValues")), names.fromString("getValue")),
+                    List.of(paramTypeClassExpr)
+            );
+        }
+        System.out.println(treeMaker.TypeCast(
+                treeMaker.Ident(names.fromString(param.vartype.toString())),
+                methodInvocation
+        ));
         return treeMaker.TypeCast(
                 treeMaker.Ident(names.fromString(param.vartype.toString())),
                 methodInvocation
@@ -267,24 +284,11 @@ public class InjectHandler extends AbstractHandler {
      * @return The injected parameter.
      */
     private JCTree.JCVariableDecl setValue(JCTree.@NotNull JCVariableDecl param, @NotNull Names names) {
-        JCTree.JCExpression paramTypeClassExpr = treeMaker.Select(
-                treeMaker.Ident(names.fromString(param.vartype.toString())),
-                names.fromString("class")
-        );
-        JCTree.JCMethodInvocation methodInvocation = treeMaker.Apply(
-                List.nil(),
-                treeMaker.Select(treeMaker.Ident(names.fromString("DIValues")), names.fromString("getValue")),
-                List.of(paramTypeClassExpr)
-        );
-        JCTree.JCExpression typeCastExpr = treeMaker.TypeCast(
-                treeMaker.Ident(names.fromString(param.vartype.toString())),
-                methodInvocation
-        );
         return treeMaker.VarDef(
                 treeMaker.Modifiers(0),
                 names.fromString(param.getName().toString()),
                 param.vartype,
-                typeCastExpr
+                initGen(param)
         );
     }
 
