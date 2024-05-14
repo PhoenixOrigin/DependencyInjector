@@ -37,6 +37,10 @@ public class DIValues {
         storeValue(value.getClass(), value);
     }
 
+    public static void storeValue(String name, Object value) {
+        storeValue(value.getClass(), value, name);
+    }
+
     /**
      * Stores a value in the hashmap
      *
@@ -57,19 +61,9 @@ public class DIValues {
      * Stores a value in the hashmap. The type is inferred from the value
      *
      * @param value the value
-     * @param name  the name of the value
-     */
-    public static void storeValue(Value value, String name) {
-        storeValue(value.value.getClass(), value.value, name);
-    }
-
-    /**
-     * Stores a value in the hashmap. The type is inferred from the value
-     *
-     * @param value the value
      */
     public static void storeValue(Value value) {
-        storeValue(value, "default");
+        storeValue(value.value.getClass(), value.value, value.name);
     }
 
     /**

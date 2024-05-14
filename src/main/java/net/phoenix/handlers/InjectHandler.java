@@ -26,12 +26,18 @@ import java.util.Objects;
  * @see net.phoenix.DIValues
  */
 @SuppressWarnings("OptionalGetWithoutIsPresent")
-public class InjectHandler extends AbstractHandler {
+public class InjectHandler {
 
     private List<JCTree.JCMethodDecl> handled = List.nil();
 
+    final Trees trees;
+    final TreeMaker treeMaker;
+    final Context context;
+
     public InjectHandler(Trees trees, TreeMaker treeMaker, Context context) {
-        super(trees, treeMaker, context);
+        this.trees = trees;
+        this.treeMaker = treeMaker;
+        this.context = context;
     }
 
     /**
@@ -39,7 +45,6 @@ public class InjectHandler extends AbstractHandler {
      *
      * @param element The element to handle.
      */
-    @Override
     public void handle(@NotNull Element element) {
         if (element.getKind() == ElementKind.FIELD) {
             field(element);

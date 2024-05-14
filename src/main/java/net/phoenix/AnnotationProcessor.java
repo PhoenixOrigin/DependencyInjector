@@ -42,7 +42,6 @@ public class AnnotationProcessor extends AbstractProcessor {
         this.context = context;
         this.trees = Trees.instance(processingEnv);
         this.treeMaker = TreeMaker.instance(context);
-        System.out.println("init");
     }
 
     /**

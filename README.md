@@ -135,6 +135,25 @@ These values can be updated at any time, and the values will be updated in the c
 While there shouldn't be a need to get values as they should be injected by themselves, you can do so by using
 the `DIValues.get(Class<T> clazz)` method.
 
+### Using IDs
+
+Instead of just storing values by the class type, you can also add an ID to the value. This is useful for scenarios where you might have multiple instances of the same object e.g. two different db Connection objects. To use this, you can add a parameter to your inject annotation.
+
+```java
+public class Foo {
+    @Inject(key = "bar")
+    private Bar bar;
+}
+```
+
+This will inject the value with the ID `bar`.
+
+Then, you can store the value with the ID:
+
+```java
+DIValues.store("bar",new Bar());
+```
+
 ### Examples
 
 #### Field Injection
