@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Stores values for dependency injection
+ *
+ * @author Phoenix
  */
 @SuppressWarnings("unused")
 public class DIValues {
