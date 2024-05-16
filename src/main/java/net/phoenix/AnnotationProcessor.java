@@ -16,7 +16,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -27,9 +26,7 @@ import java.util.Set;
 @AutoService(javax.annotation.processing.Processor.class)
 public class AnnotationProcessor extends AbstractProcessor {
 
-    private Trees trees;
-    private TreeMaker treeMaker;
-    private Context context;
+    private InjectHandler injectHandler;
 
     /**
      * Initializes the processor
@@ -41,9 +38,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         super.init(processingEnv);
         AccessWidener.addOpens();
         Context context = ((JavacProcessingEnvironment) processingEnv).getContext();
-        this.context = context;
-        this.trees = Trees.instance(processingEnv);
-        this.treeMaker = TreeMaker.instance(context);
+        this.injectHandler = new InjectHandler(Trees.instance(processingEnv), TreeMaker.instance(context), context);
     }
 
     /**
@@ -63,9 +58,7 @@ public class AnnotationProcessor extends AbstractProcessor {
      */
     @Override
     public @NotNull Set<String> getSupportedAnnotationTypes() {
-        HashSet<String> annotations = new HashSet<>();
-        annotations.add(Inject.class.getCanonicalName());
-        return annotations;
+        return Set.of(Inject.class.getCanonicalName());
     }
 
     /**
@@ -77,12 +70,7 @@ public class AnnotationProcessor extends AbstractProcessor {
      */
     @Override
     public boolean process(Set<? extends TypeElement> annotations, @NotNull RoundEnvironment roundEnv) {
-        InjectHandler injectHandler = new InjectHandler(trees, treeMaker, context);
-
-        for (Element element : roundEnv.getElementsAnnotatedWith(Inject.class)) {
-            injectHandler.handle(element);
-        }
-
+        for (Element element : roundEnv.getElementsAnnotatedWith(Inject.class)) injectHandler.handle(element);
         return true;
     }
 }

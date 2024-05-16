@@ -8,12 +8,16 @@ the necessary dependencies.
 
 ### Setting up
 
-To use the dependency injector, you need to add the following dependencies to your `build.gradle` file:
+To use the dependency injector, you need to add the following dependencies and repositories to your `build.gradle` file:
 
 ```groovy
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    compileOnly 'io.github.phoenixorigin:dependency-injector:1.0.0'
-    annotationProcessor 'io.github.phoenixorigin:dependency-injector:1.0.0'
+    compileOnly 'io.github.phoenixorigin:dependency-injector:1.0.4'
+    annotationProcessor 'io.github.phoenixorigin:dependency-injector:1.0.4'
 }
 ```
 <br>

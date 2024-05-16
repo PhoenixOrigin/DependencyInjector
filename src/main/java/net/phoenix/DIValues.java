@@ -1,6 +1,7 @@
 package net.phoenix;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class DIValues {
         storeValue(value.getClass(), value);
     }
 
-    public static void storeValue(String name, Object value) {
+    public static void storeValue(String name, @NotNull Object value) {
         storeValue(value.getClass(), value, name);
     }
 
@@ -48,9 +49,9 @@ public class DIValues {
      * @param value the value
      * @param name  the name of the value
      */
-    public static void storeValue(Class<?> clazz, Object value, String name) {
+    public static void storeValue(@NotNull Class<?> clazz, Object value, String name) {
         List<Value> values = diValues.get(clazz);
-        if(values == null) {
+        if (values == null) {
             values = new ArrayList<>();
         }
         values.add(new Value(value, name));
@@ -62,29 +63,31 @@ public class DIValues {
      *
      * @param value the value
      */
-    public static void storeValue(Value value) {
+    public static void storeValue(@NotNull Value value) {
         storeValue(value.value.getClass(), value.value, value.name);
     }
 
     /**
      * Gets a value from the hashmap
      * Note: this is mostly for internal use but can still be used externally
+     *
      * @param clazz the class of the value
      * @return the value
      */
-    public static Object getValue(Class<?> clazz) {
+    public static @Nullable Object getValue(Class<?> clazz) {
         return getValue(clazz, "default");
     }
 
     /**
      * Gets a value from the hashmap
      * Note: this is mostly for internal use but can still be used externally
+     *
      * @param clazz the class of the value
-     * @param name the name of the value
+     * @param name  the name of the value
      * @return the value
      */
-    public static Object getValue(Class<?> clazz, String name) {
-        if(!diValues.containsKey(clazz)) {
+    public static @Nullable Object getValue(Class<?> clazz, String name) {
+        if (!diValues.containsKey(clazz)) {
             return null;
         }
         return diValues.get(clazz).stream().filter(value -> value.name().equals(name)).map(Value::value).findFirst().orElse(null);

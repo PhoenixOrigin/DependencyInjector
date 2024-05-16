@@ -1,6 +1,8 @@
 package net.phoenix.javac;
 
 import net.phoenix.AnnotationProcessor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import sun.misc.Unsafe;
 
 import java.io.OutputStream;
@@ -8,19 +10,30 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+/**
+ * AccessWidener
+ * <br> <br>
+ * <p>
+ * Code was taken and rewritten from Lombok
+ * </p>
+ *
+ * @author Phoenix
+ */
 @SuppressWarnings({"all"})
 public class AccessWidener {
     private static final long ACCESSIBLE_OVERRIDE_FIELD_OFFSET;
     private static final IllegalAccessException INIT_ERROR;
-    private static final Unsafe UNSAFE = (Unsafe) reflectiveStaticFieldAccess(Unsafe.class, "theUnsafe");
+    private static final @Nullable Unsafe UNSAFE = (Unsafe) reflectiveStaticFieldAccess(Unsafe.class, "theUnsafe");
 
     static {
         long g;
         Throwable ex;
         try {
-            g = 0; ex = null;
+            g = 0;
+            ex = null;
         } catch (Throwable t) {
-            g = -1L; ex = t;
+            g = -1L;
+            ex = t;
         }
         ACCESSIBLE_OVERRIDE_FIELD_OFFSET = g;
         INIT_ERROR = ex instanceof IllegalAccessException ? (IllegalAccessException) ex : (IllegalAccessException) new IllegalAccessException("Cannot initialize Unsafe-based permit").initCause(ex);
@@ -34,18 +47,18 @@ public class AccessWidener {
             Object ownModule = Class.class.getDeclaredMethod("getModule").invoke(AnnotationProcessor.class);
             Method m = cModule.getDeclaredMethod("implAddOpens", String.class, cModule);
             unsafe.putBooleanVolatile(m, unsafe.objectFieldOffset(Parent.class.getDeclaredField("first")), true);
-            for (String p : new String[]{"com.sun.tools.javac.processing", "com.sun.tools.javac.tree", "com.sun.tools.javac.util"}) m.invoke(jdkCompilerModule, p, ownModule);
-        } catch (Exception ignore) {}
+            for (String p : new String[]{"com.sun.tools.javac.processing", "com.sun.tools.javac.tree", "com.sun.tools.javac.util"})
+                m.invoke(jdkCompilerModule, p, ownModule);
+        } catch (Exception ignore) {
+        }
     }
 
     private static Object getJdkCompilerModule() throws Exception {
         Class<?> cModuleLayer = Class.forName("java.lang.ModuleLayer");
-        Object bootLayer = cModuleLayer.getDeclaredMethod("boot").invoke(null);
-        Object oCompilerO = cModuleLayer.getDeclaredMethod("findModule", String.class).invoke(bootLayer, "jdk.compiler");
-        return Class.forName("java.util.Optional").getDeclaredMethod("get").invoke(oCompilerO);
+        return Class.forName("java.util.Optional").getDeclaredMethod("get").invoke(cModuleLayer.getDeclaredMethod("findModule", String.class).invoke(cModuleLayer.getDeclaredMethod("boot").invoke(null), "jdk.compiler"));
     }
 
-    private static Object reflectiveStaticFieldAccess(Class<?> c, String fName) {
+    private static @Nullable Object reflectiveStaticFieldAccess(@NotNull Class<?> c, @NotNull String fName) {
         try {
             Field f = c.getDeclaredField(fName);
             f.setAccessible(true);
@@ -55,7 +68,7 @@ public class AccessWidener {
         }
     }
 
-    public static Method getMethod(Class<?> c, String mName, Class<?>... parameterTypes) throws NoSuchMethodException {
+    private static @NotNull Method getMethod(@Nullable Class<?> c, @NotNull String mName, Class<?>... parameterTypes) throws NoSuchMethodException {
         Method m = null;
         while (c != null && m == null) {
             try {
@@ -68,7 +81,7 @@ public class AccessWidener {
         return setAccessible(m);
     }
 
-    public static <T extends AccessibleObject> T setAccessible(T accessor) {
+    private static <T extends AccessibleObject> T setAccessible(@NotNull T accessor) {
         if (INIT_ERROR == null) {
             UNSAFE.putBoolean(accessor, ACCESSIBLE_OVERRIDE_FIELD_OFFSET, true);
         } else {
@@ -95,10 +108,9 @@ public class AccessWidener {
     }
 
     static class Parent {
-        boolean first;
         static final Object staticObj = OutputStream.class;
+        private static volatile boolean staticSecond, staticThird;
+        boolean first;
         volatile Object second;
-        private static volatile boolean staticSecond;
-        private static volatile boolean staticThird;
     }
 }
