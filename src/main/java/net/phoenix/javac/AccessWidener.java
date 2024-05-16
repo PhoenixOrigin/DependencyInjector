@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
  * AccessWidener
  * <br> <br>
  * <p>
- * Code was taken and rewritten from Lombok
+ * Note: Code was taken and rewritten from Lombok
  * </p>
  *
  * @author Phoenix

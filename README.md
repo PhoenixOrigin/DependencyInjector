@@ -20,6 +20,8 @@ dependencies {
     annotationProcessor 'io.github.phoenixorigin:dependency-injector:1.0.4'
 }
 ```
+**Note**: The annotationProcessor should be put __before__ other annotation processors- it will modify methods / fields that other annotation handlers might read and process and the injected methods won't be injected if 
+the other annotation processors run before this one.
 <br>
 
 ### Injecting Dependencies
