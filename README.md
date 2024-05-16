@@ -16,21 +16,7 @@ dependencies {
     annotationProcessor 'io.github.phoenixorigin:dependency-injector:1.0.0'
 }
 ```
-
-Then, you need to expose the sun packages by adding the following to your `build.gradle` file:
-
-```groovy
-compileJava {
-    options.fork = true
-    options.forkOptions.with {
-        jvmArgs = [
-                '--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
-                '--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
-                '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-        ]
-    }
-}
-```
+<br>
 
 ### Injecting Dependencies
 

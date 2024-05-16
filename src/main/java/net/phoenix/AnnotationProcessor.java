@@ -7,6 +7,7 @@ import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import net.phoenix.annotations.Inject;
 import net.phoenix.handlers.InjectHandler;
+import net.phoenix.javac.AccessWidener;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -38,6 +39,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(@NotNull ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
+        AccessWidener.addOpens();
         Context context = ((JavacProcessingEnvironment) processingEnv).getContext();
         this.context = context;
         this.trees = Trees.instance(processingEnv);

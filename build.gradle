@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'io.github.phoenixorigin'
+group = 'net.phoenix'
 version = '1.0.0'
 
 repositories {
@@ -23,11 +23,9 @@ test {
 
 compileJava {
     options.fork = true
-    options.forkOptions.with {
-        jvmArgs = [
-                '--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
-                '--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
-                '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-        ]
-    }
+    options.compilerArgs += [
+            '--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
+            '--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+            '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+    ]
 }
