@@ -34,7 +34,7 @@ public class AccessWidener {
             Object ownModule = Class.class.getDeclaredMethod("getModule").invoke(AnnotationProcessor.class);
             Method m = cModule.getDeclaredMethod("implAddOpens", String.class, cModule);
             unsafe.putBooleanVolatile(m, unsafe.objectFieldOffset(Parent.class.getDeclaredField("first")), true);
-            for (String p : new String[]{"com.sun.tools.javac.code", "com.sun.tools.javac.comp", "com.sun.tools.javac.file", "com.sun.tools.javac.main", "com.sun.tools.javac.model", "com.sun.tools.javac.parser", "com.sun.tools.javac.processing", "com.sun.tools.javac.tree", "com.sun.tools.javac.util", "com.sun.tools.javac.jvm"}) m.invoke(jdkCompilerModule, p, ownModule);
+            for (String p : new String[]{"com.sun.tools.javac.processing", "com.sun.tools.javac.tree", "com.sun.tools.javac.util"}) m.invoke(jdkCompilerModule, p, ownModule);
         } catch (Exception ignore) {}
     }
 
