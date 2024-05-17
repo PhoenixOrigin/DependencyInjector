@@ -1,22 +1,10 @@
 package net.phoenix.handlers;
 
 import com.sun.source.util.Trees;
-import com.sun.tools.javac.tree.JCTree.JCAnnotation;
-import com.sun.tools.javac.tree.JCTree.JCAssign;
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
-import com.sun.tools.javac.tree.JCTree.JCExpression;
-import com.sun.tools.javac.tree.JCTree.JCIdent;
-import com.sun.tools.javac.tree.JCTree.JCLiteral;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.tree.JCTree.*;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.tree.TreeScanner;
-import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.List;
-import com.sun.tools.javac.util.ListBuffer;
-import com.sun.tools.javac.util.Name;
-import com.sun.tools.javac.util.Names;
+import com.sun.tools.javac.util.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.lang.model.element.Element;
@@ -74,14 +62,8 @@ public class InjectHandler {
     private void field(Element element) {
         JCVariableDecl variableDecl = (JCVariableDecl) trees.getTree(element);
         JCClassDecl classDecl = (JCClassDecl) trees.getPath(element).getCompilationUnit().getTypeDecls().get(0);
-
         variableDecl.init = initGen(variableDecl);
-
-        classDecl.defs.forEach(m -> {
-            if (m instanceof JCMethodDecl methodDecl) {
-                if (shouldInject(methodDecl, variableDecl)) modifyMethod(methodDecl, variableDecl, classDecl);
-            }
-        });
+        classDecl.defs.forEach(m -> {if (m instanceof JCMethodDecl methodDecl) if (new TreeChecker(variableDecl.getName()).check(methodDecl)) methodDecl.body.stats = methodDecl.body.stats.prepend(treeMaker.Exec(treeMaker.Assign(treeMaker.Select(treeMaker.Ident(classDecl.name), variableDecl.getName()), initGen(variableDecl))));});
     }
 
     /**
@@ -91,12 +73,8 @@ public class InjectHandler {
      * @param classDecl  The class declaration to handle.
      */
     private void parameter(@NotNull JCMethodDecl methodDecl, @NotNull JCClassDecl classDecl) {
-        if (handled.contains(methodDecl)) {
-            return;
-        }
-
+        if (handled.contains(methodDecl)) return;
         JCMethodDecl newMethodDecl = copy(methodDecl);
-
         sortParams(newMethodDecl, names);
         classDecl.defs.remove(methodDecl);
         classDecl.defs = classDecl.defs.prepend(newMethodDecl);
@@ -110,7 +88,6 @@ public class InjectHandler {
      */
     private void parameter(@NotNull VariableElement parameterElement) {
         ExecutableElement methodElement = (ExecutableElement) parameterElement.getEnclosingElement();
-
         JCMethodDecl originalMethodDecl = (JCMethodDecl) trees.getTree(methodElement);
         parameter(originalMethodDecl, getClassDecl(parameterElement));
     }
@@ -153,38 +130,6 @@ public class InjectHandler {
             param.mods.annotations = param.mods.annotations.prepend(treeMaker.Annotation(treeMaker.Ident(names.fromString("Inject")), List.nil()));
         }
         parameter(methodDecl, (JCClassDecl) trees.getTree(element.getEnclosingElement()));
-    }
-
-    /**
-     * Checks if a method should be injected.
-     *
-     * @param methodDecl   The method declaration to check.
-     * @param variableDecl The variable declaration to check.
-     * @return True if the method should be injected, false otherwise.
-     */
-    private boolean shouldInject(JCMethodDecl methodDecl, @NotNull JCVariableDecl variableDecl) {
-        final boolean[] isReferenced = {false};
-        Name n = variableDecl.getName();
-        TreeScanner scanner = new TreeScanner() {
-            @Override
-            public void visitIdent(@NotNull JCIdent jcIdent) {
-                if (jcIdent.name.equals(n)) isReferenced[0] = true;
-                super.visitIdent(jcIdent);
-            }
-        };
-        scanner.scan(methodDecl);
-        return isReferenced[0];
-    }
-
-    /**
-     * Modifies a method to inject a value from {@link net.phoenix.DIValues#getValue(Class)} into a field.
-     *
-     * @param method       The method to modify.
-     * @param variableDecl The variable declaration to inject.
-     * @param classDecl    The class declaration
-     */
-    private void modifyMethod(@NotNull JCMethodDecl method, @NotNull JCVariableDecl variableDecl, @NotNull JCClassDecl classDecl) {
-        method.body.stats = method.body.stats.prepend(treeMaker.Exec(treeMaker.Assign(treeMaker.Select(treeMaker.Ident(classDecl.name), variableDecl.getName()), initGen(variableDecl))));
     }
 
     /**
@@ -245,7 +190,7 @@ public class InjectHandler {
         ListBuffer<JCVariableDecl> newParams = new ListBuffer<>();
         for (JCVariableDecl param : methodDecl.params) {
             if (shouldInject(param)) {
-                methodDecl.body.stats = methodDecl.body.stats.prepend(setValue(param, names));
+                methodDecl.body.stats = methodDecl.body.stats.prepend(treeMaker.VarDef(treeMaker.Modifiers(0), names.fromString(param.getName().toString()), param.vartype, initGen(param)));
                 continue;
             }
             newParams.append(param);
@@ -260,32 +205,14 @@ public class InjectHandler {
      * @return The copied method declaration.
      */
     private JCMethodDecl copy(@NotNull JCMethodDecl method) {
-        return treeMaker.MethodDef(
-                method.mods,
-                method.name,
-                method.restype,
-                method.typarams,
-                method.params,
-                method.thrown,
-                method.body,
-                method.defaultValue
-        );
+        return treeMaker.MethodDef(method.mods, method.name, method.restype, method.typarams, method.params, method.thrown, method.body, method.defaultValue);
     }
 
-    /**
-     * Injects a value from {@link net.phoenix.DIValues#getValue(Class)} into a parameter.
-     *
-     * @param param The parameter to inject.
-     * @param names The names
-     * @return The injected parameter.
-     */
-    private JCVariableDecl setValue(@NotNull JCVariableDecl param, @NotNull Names names) {
-        return treeMaker.VarDef(
-                treeMaker.Modifiers(0),
-                names.fromString(param.getName().toString()),
-                param.vartype,
-                initGen(param)
-        );
+    static class TreeChecker extends TreeScanner {
+        Name n;boolean referenced = false;
+        public TreeChecker(Name n) {this.n = n;}
+        public boolean check(JCMethodDecl tree) {scan(tree);return referenced;}
+        @Override public void visitIdent(@NotNull JCIdent jcIdent) {if (jcIdent.name.equals(n)) referenced = true; super.visitIdent(jcIdent);}
     }
 
 }
