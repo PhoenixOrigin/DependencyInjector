@@ -36,7 +36,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(@NotNull ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        AccessWidener.addOpens();
+        AccessWidener.addOpens("com.sun.tools.javac.processing", "com.sun.tools.javac.tree", "com.sun.tools.javac.util");
         Context context = ((JavacProcessingEnvironment) processingEnv).getContext();
         this.injectHandler = new InjectHandler(Trees.instance(processingEnv), TreeMaker.instance(context), context);
     }

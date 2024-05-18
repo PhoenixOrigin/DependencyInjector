@@ -39,7 +39,7 @@ public class AccessWidener {
         INIT_ERROR = ex instanceof IllegalAccessException ? (IllegalAccessException) ex : (IllegalAccessException) new IllegalAccessException("Cannot initialize Unsafe-based permit").initCause(ex);
     }
 
-    public static void addOpens() {
+    public static void addOpens(String... packages) {
         try {
             Class<?> cModule = Class.forName("java.lang.Module");
             Unsafe unsafe = (Unsafe) reflectiveStaticFieldAccess(Unsafe.class, "theUnsafe");
@@ -47,7 +47,7 @@ public class AccessWidener {
             Object ownModule = Class.class.getDeclaredMethod("getModule").invoke(AnnotationProcessor.class);
             Method m = cModule.getDeclaredMethod("implAddOpens", String.class, cModule);
             unsafe.putBooleanVolatile(m, unsafe.objectFieldOffset(Parent.class.getDeclaredField("first")), true);
-            for (String p : new String[]{"com.sun.tools.javac.processing", "com.sun.tools.javac.tree", "com.sun.tools.javac.util"})
+            for (String p : packages)
                 m.invoke(jdkCompilerModule, p, ownModule);
         } catch (Exception ignore) {
         }
