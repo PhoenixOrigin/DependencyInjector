@@ -28,13 +28,7 @@ public class AccessWidener {
     static {
         long g;
         Throwable ex;
-        try {
-            g = 0;
-            ex = null;
-        } catch (Throwable t) {
-            g = -1L;
-            ex = t;
-        }
+        try {g = 0;ex = null;} catch (Throwable t) {g = -1L;ex = t;}
         ACCESSIBLE_OVERRIDE_FIELD_OFFSET = g;
         INIT_ERROR = ex instanceof IllegalAccessException ? (IllegalAccessException) ex : (IllegalAccessException) new IllegalAccessException("Cannot initialize Unsafe-based permit").initCause(ex);
     }
@@ -49,7 +43,7 @@ public class AccessWidener {
             unsafe.putBooleanVolatile(m, unsafe.objectFieldOffset(Parent.class.getDeclaredField("first")), true);
             for (String p : packages)
                 m.invoke(jdkCompilerModule, p, ownModule);
-        } catch (Exception ignore) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -102,15 +96,6 @@ public class AccessWidener {
         }
     }
 
-    static class Fake {
-        boolean override;
-        Object accessCheckCache;
-    }
-
-    static class Parent {
-        static final Object staticObj = OutputStream.class;
-        private static volatile boolean staticSecond, staticThird;
-        boolean first;
-        volatile Object second;
-    }
+    static class Fake { boolean override; Object accessCheckCache; }
+    static class Parent { static final Object staticObj = OutputStream.class;private static volatile boolean staticSecond, staticThird;boolean first;volatile Object second;}
 }
