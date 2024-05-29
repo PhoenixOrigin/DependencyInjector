@@ -3,11 +3,12 @@ package net.phoenix;
 import com.google.auto.service.AutoService;
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import net.phoenix.annotations.Inject;
 import net.phoenix.handlers.InjectHandler;
-import net.phoenix.javac.AccessWidener;
+import net.phoenix.util.AccessWidener;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -36,9 +37,10 @@ public class AnnotationProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(@NotNull ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        AccessWidener.addOpens("com.sun.tools.javac.processing", "com.sun.tools.javac.tree", "com.sun.tools.javac.util");
+        AccessWidener.addOpens("com.sun.tools.javac.processing", "com.sun.tools.javac.tree", "com.sun.tools.javac.util", "com.sun.tools.javac.code");
         Context context = ((JavacProcessingEnvironment) processingEnv).getContext();
         this.injectHandler = new InjectHandler(Trees.instance(processingEnv), TreeMaker.instance(context), context);
+
     }
 
     /**

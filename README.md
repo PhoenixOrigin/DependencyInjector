@@ -16,8 +16,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.github.phoenixorigin:dependency-injector:1.0.4'
-    annotationProcessor 'io.github.phoenixorigin:dependency-injector:1.0.4'
+    compileOnly 'io.github.phoenixorigin:dependency-injector:1.0.5'
+    annotationProcessor 'io.github.phoenixorigin:dependency-injector:1.0.5'
 }
 ```
 **Note**: The annotationProcessor should be put __before__ other annotation processors- it will modify methods / fields that other annotation handlers might read and process and the injected methods won't be injected if 
@@ -157,7 +157,7 @@ public class Bar {
     private String str;
 
     public void doSomething() {
-        System.out.println(str);
+        
     }
 }
 ```
@@ -188,7 +188,7 @@ public class Bar {
     }
 
     public void doSomething() {
-        System.out.println(str);
+        
     }
 }
 ```
@@ -212,7 +212,7 @@ public class Main {
 ```java
 public class Bar {
     public void doSomething(@Inject String str) {
-        System.out.println(str);
+        
     }
 }
 ```
@@ -240,7 +240,7 @@ public class Bar {
     private String str;
 
     public void doSomething() {
-        System.out.println(str);
+        
     }
 }
 ```
