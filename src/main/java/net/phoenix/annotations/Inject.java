@@ -4,7 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to mark fields, parameters, classes or methods that should be injected with values from  {@link net.phoenix.DIValues#getValue(Class)}.
+ * Annotation to mark fields, parameters, classes or methods that should be injected with values from  {@link net.phoenix.util.DIValues#getValue(Class)}.
  *
  * @author Phoenix
  */

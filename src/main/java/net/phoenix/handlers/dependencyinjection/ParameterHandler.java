@@ -89,7 +89,6 @@ public class ParameterHandler extends AbstractHandler {
             }
         }
         classDecl.defs = defs.reverse();
-        classDecl.defs = classDecl.defs.prepend(newMethodDecl);
         handled = handled.prepend(newMethodDecl);
     }
 

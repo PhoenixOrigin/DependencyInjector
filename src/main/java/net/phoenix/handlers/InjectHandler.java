@@ -16,11 +16,11 @@ import javax.lang.model.element.ElementKind;
 
 /**
  * Handler for the {@link net.phoenix.annotations.Inject} annotation.
- * Injects values from {@link net.phoenix.DIValues#getValue(Class)} into fields, parameters, classes or methods annotated with {@link net.phoenix.annotations.Inject}.
+ * Injects values from {@link net.phoenix.util.DIValues#getValue(Class)} into fields, parameters, classes or methods annotated with {@link net.phoenix.annotations.Inject}.
  *
  * @author Phoenix
  * @see net.phoenix.annotations.Inject
- * @see net.phoenix.DIValues
+ * @see net.phoenix.util.DIValues
  */
 public class InjectHandler {
 

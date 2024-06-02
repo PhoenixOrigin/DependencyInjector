@@ -16,8 +16,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.github.phoenixorigin:dependency-injector:1.0.5'
-    annotationProcessor 'io.github.phoenixorigin:dependency-injector:1.0.5'
+    compileOnly 'io.github.phoenixorigin:DependencyInjector:1.0.6'
+    annotationProcessor 'io.github.phoenixorigin:DependencyInjector:1.0.6'
 }
 ```
 **Note**: The annotationProcessor should be put __before__ other annotation processors- it will modify methods / fields that other annotation handlers might read and process and the injected methods won't be injected if 
